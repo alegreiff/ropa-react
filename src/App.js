@@ -1,28 +1,49 @@
 import React from 'react';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 
 import './App.css';
 import HomePage from './pages/homepage/homepage.component'
 import ShopPage from './pages/shop/shop.component'
 import Header from './components/header/header.component'
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
+import { auth } from './firebase/firebase.utils'
 
-const Hatspage = () => (
-  <h1>Los sombreros pe</h1>
-)
 
-function App() {
-  return (
-    <div>
-      <Header />
-      <Switch>
-        <Route exact path='/' component={HomePage} />
-        <Route exact path='/shop' component={ShopPage} />
-        <Route exact path='/signin' component={SignInAndSignUpPage} />
-      </Switch>
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      currentUser: null,
+      nombre: 'Jaime'
+    }
+  }
+  unsuscribeFromAuth = null
 
-    </div>
-  );
+  componentDidMount() {
+    this.unsuscribeFromAuth = auth.onAuthStateChanged(user => {
+      this.setState({ currentUser: user })
+      console.log(user)
+    })
+  }
+
+  componentWillUnmount() {
+    this.unsuscribeFromAuth();
+  }
+
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser} nombre={this.state.nombre} />
+        <Switch>
+          <Route exact path='/' component={HomePage} />
+          <Route exact path='/shop' component={ShopPage} />
+          <Route exact path='/signin' component={SignInAndSignUpPage} />
+        </Switch>
+
+      </div>
+    );
+  }
+
 }
 
 export default App;
